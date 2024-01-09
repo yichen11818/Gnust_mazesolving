@@ -1,6 +1,12 @@
 {
     "files.associations": {
         "*.json": "jsonc",
-        "vector": "cpp"
-    }
+        "vector": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "tuple": "cpp"
+    },
+    "cSpell.words": [
+        "selectnum"
+    ]
 }
