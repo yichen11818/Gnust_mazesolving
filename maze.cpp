@@ -2,9 +2,8 @@
 #include <limits> 
 using namespace std;
 
-const int MAXLength = 101;  //MAXLength 最大迷宫尺寸
-int maze[MAXLength][MAXLength]; //迷宫数组：1代表墙壁，0代表通路
-int path[MAXLength][MAXLength]; //路径数组：标记已经访问过的路径
+int **maze; //迷宫数组：1代表墙壁，0代表通路
+int **path; //路径数组：标记已经访问过的路径
 int maze_x, maze_y;  //maze_x maze_y 迷宫的行数和列数 
 
 /* 8个可能的移动方向
@@ -88,18 +87,39 @@ void printPath() {
     cout << endl;
     cout << endl;
 }
+
+
+void allocateMemory() {
+    maze = new int*[maze_x];
+    path = new int*[maze_x];
+    for (int i = 0; i < maze_x; i++) {
+        maze[i] = new int[maze_y]();
+        path[i] = new int[maze_y]();
+    }
+}
+void deallocateMemory() {
+    for (int i = 0; i < maze_x; i++) {
+        delete[] maze[i];
+        delete[] path[i];
+    }
+    delete[] maze;
+    delete[] path;
+}
+
+
+
 //输入迷宫长宽
 void inputMazeSize() {
-    cout << "请输入迷宫长宽(长宽不大于 " << MAXLength - 1 << ", 用空格隔开): ";
-    if (!(cin >> maze_x >> maze_y) || maze_x <= 0 || maze_y <= 0 || maze_x >= MAXLength || maze_y >= MAXLength) {
-        // 输入无效或超出范围时，清除错误标志并忽略剩余输入
+    cout << "请输入迷宫长宽(长宽为正整数，用空格隔开): ";
+    if (!(cin >> maze_x >> maze_y) || maze_x <= 0 || maze_y <= 0) {
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "无效输入，请输入一个介于 1 和 " << MAXLength - 1 << " 之间的整数。" << endl;
-        // 递归调用直到输入有效
+        cout << "无效输入，请输入正整数。" << endl;
         inputMazeSize();
     }
 }
+
+
 // 输入路径数组
 void inputMaze() {
     cout << "请以二元组(i,j)形式输入迷宫(其中1代表墙壁 0代表通路)" << endl;
@@ -116,7 +136,11 @@ void inputMaze() {
         }
     }
 }
+
+
 void defaultInput() {
+    maze_x = maze_y = 10; // 设置迷宫大小为10x10
+    allocateMemory(); // 分配内存
     // 预定义的默认迷宫数据
     int defaultMaze[10][10] = {
         {0, 0, 1, 1, 1, 0, 0, 0, 0, 1},
@@ -136,7 +160,6 @@ void defaultInput() {
             cout<<defaultMaze[i][j]<<" ";
         }cout<<endl;
     }
-    maze_x = maze_y = 10; // 设置迷宫大小为10x10
     for (int i = 0; i < maze_x; i++) {
         for (int j = 0; j < maze_y; j++) {
             maze[i][j] = defaultMaze[i][j];
@@ -163,8 +186,8 @@ int menu() {
             break;
         case 2:
             cout << "请输入迷宫长宽"<<endl; 
-            cout << "长宽不大于"<<MAXLength - 1<<",用空格隔开"<<endl;
             inputMazeSize();
+            allocateMemory(); 
             inputMaze();
             break;
         case 0:
@@ -176,6 +199,7 @@ int menu() {
     cout << endl;
     return selectnum;
 }
+
 int main() {
     while (true) {
         int selection = menu();
@@ -189,12 +213,15 @@ int main() {
             continue;
         }
 
+
         if (dfs(0, 0)) { // 从入口开始搜索
             printMazeWithPath(); // 打印带路径的迷宫
             printPath(); // 打印路径
+
         } else {
             cout << "No path found." << endl;
         }
+        deallocateMemory(); 
     }
     return 0;
 }
