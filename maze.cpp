@@ -88,7 +88,7 @@ void printPath() {
     cout << endl;
 }
 
-
+//动态数组内存分配
 void allocateMemory() {
     maze = new int*[maze_x];
     path = new int*[maze_x];
@@ -97,6 +97,7 @@ void allocateMemory() {
         path[i] = new int[maze_y]();
     }
 }
+//动态数组内存释放
 void deallocateMemory() {
     for (int i = 0; i < maze_x; i++) {
         delete[] maze[i];
