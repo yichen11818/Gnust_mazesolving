@@ -1,4 +1,5 @@
 #include <iostream>
+#include <limits> 
 using namespace std;
 
 const int MAXLength = 101;  //MAXLength 最大迷宫尺寸
@@ -87,16 +88,33 @@ void printPath() {
     cout << endl;
     cout << endl;
 }
+//输入迷宫长宽
+void inputMazeSize() {
+    cout << "请输入迷宫长宽(长宽不大于 " << MAXLength - 1 << ", 用空格隔开): ";
+    if (!(cin >> maze_x >> maze_y) || maze_x <= 0 || maze_y <= 0 || maze_x >= MAXLength || maze_y >= MAXLength) {
+        // 输入无效或超出范围时，清除错误标志并忽略剩余输入
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "无效输入，请输入一个介于 1 和 " << MAXLength - 1 << " 之间的整数。" << endl;
+        // 递归调用直到输入有效
+        inputMazeSize();
+    }
+}
 // 输入路径数组
-void inputMaze(){
-    cout << "请以二元组(i,j)形式输入迷宫(其中1代表墙壁 0代表通路)"<<endl;
+void inputMaze() {
+    cout << "请以二元组(i,j)形式输入迷宫(其中1代表墙壁 0代表通路)" << endl;
     for (int i = 0; i < maze_x; i++) {
-            for (int j = 0; j < maze_y; j++) {
-                cin >> maze[i][j];
-                path[i][j] = 0; // 初始化路径数组
+        for (int j = 0; j < maze_y; j++) {
+            while (!(cin >> maze[i][j]) || (maze[i][j] != 0 && maze[i][j] != 1)) {
+                // 清除错误标志
+                cin.clear();
+                // 忽略当前行的剩余输入
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "无效输入，请输入0或1: ";
             }
+            path[i][j] = 0; // 初始化路径数组
         }
-        
+    }
 }
 void defaultInput() {
     // 预定义的默认迷宫数据
@@ -145,8 +163,8 @@ int menu() {
             break;
         case 2:
             cout << "请输入迷宫长宽"<<endl; 
-            cout << "长宽不大于100,用空格隔开"<<endl;
-            cin >> maze_x >> maze_y;
+            cout << "长宽不大于"<<MAXLength - 1<<",用空格隔开"<<endl;
+            inputMazeSize();
             inputMaze();
             break;
         case 0:
@@ -159,9 +177,19 @@ int menu() {
     return selectnum;
 }
 int main() {
-    while (menu() != 0) {
+    while (true) {
+        int selection = menu();
+        if (selection == 0) {
+            break;
+        }
         
-        if (dfs(0, 0)) {// 从入口开始搜索
+        // 检查迷宫入口和出口是否有效
+        if (maze[0][0] == 1 || maze[maze_x - 1][maze_y - 1] == 1) {
+            cout << "迷宫入口或出口被堵住了，请重新输入。" << endl;
+            continue;
+        }
+
+        if (dfs(0, 0)) { // 从入口开始搜索
             printMazeWithPath(); // 打印带路径的迷宫
             printPath(); // 打印路径
         } else {
