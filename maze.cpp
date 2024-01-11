@@ -216,7 +216,6 @@ int menu() {
             defaultInput();
             break;
         case 2:
-            cout << "请输入迷宫长宽"<<endl; 
             inputMazeSize();
             allocateMemory(); 
             inputMaze();
