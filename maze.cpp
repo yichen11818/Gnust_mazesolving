@@ -1,5 +1,6 @@
 #include <iostream>
 #include <limits> 
+#include <ctime>
 using namespace std;
 
 int **maze; //迷宫数组：1代表墙壁，0代表通路
@@ -169,16 +170,45 @@ void defaultInput() {
     }
 }
 
+void randomMaze(){
+    const int size = 10;
+    maze_x = maze_y = size;
+    const int threshold = 3;
+    int randomMaze[size][size]; 
+    srand(time(0)); 
+    allocateMemory();
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            randomMaze[i][j] = (rand() % 4 < threshold ? 0 : 1);
+        }
+    }
+    // 输出生成的迷宫数组
+    cout << "随机生成的迷宫为：" << endl;
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < size; ++j) {
+            cout << randomMaze[i][j] << " ";
+        }
+        cout << endl;
+    }
+    
+    for (int i = 0; i < maze_x; i++) {
+        for (int j = 0; j < maze_y; j++) {
+            maze[i][j] = randomMaze[i][j];
+            path[i][j] = 0;
+        }
+    }
+}
 
 int menu() {
     int selectnum;
-    cout << "# # # # # # # # # # # # # #" << endl;
-    cout << "# Maze Problem for C++    #" << endl;
-    cout << "# Main menu               #" << endl;
-    cout << "# 1. Default input        #" << endl;
-    cout << "# 2. Enter maze manually  #" << endl;
-    cout << "# 0. Exit!                #" << endl;
-    cout << "# # # # # # # # # # # # # #" << endl;
+    cout << "# # # # # # # # # # # # # # # #" << endl;
+    cout << "# Maze Problem for C++        #" << endl;
+    cout << "# Main menu                   #" << endl;
+    cout << "# 1. Default input            #" << endl;
+    cout << "# 2. Enter maze manually      #" << endl;
+    cout << "# 3. Random maze generation   #" << endl;
+    cout << "# 0. Exit!                    #" << endl;
+    cout << "# # # # # # # # # # # # # # # #" << endl;
     cout << "Please enter number to select: ";
     cin >> selectnum;
     switch (selectnum) {
@@ -191,10 +221,13 @@ int menu() {
             allocateMemory(); 
             inputMaze();
             break;
+        case 3:
+            randomMaze();
+            break;
         case 0:
             return 0;
         default:
-            cout << "Invalid selection. Please try again." << endl;
+            cout << "错误输入,请重试" << endl;
             break;
     }
     cout << endl;
@@ -207,22 +240,26 @@ int main() {
         if (selection == 0) {
             break;
         }
-        
-        // 检查迷宫入口和出口是否有效
-        if (maze[0][0] == 1 || maze[maze_x - 1][maze_y - 1] == 1) {
-            cout << "迷宫入口或出口被堵住了，请重新输入。" << endl;
-            continue;
+        if (selection == 1 || selection == 2 || selection == 3) {
+            if (maze_x == 0 || maze_y == 0) {
+                cout << "迷宫长宽不能为0，请重新输入。" << endl;
+                continue;
+            }
+            // 检查迷宫入口和出口是否有效
+            if (maze[0][0] == 1 || maze[maze_x - 1][maze_y - 1] == 1) {
+                cout << "迷宫入口或出口被堵住了，请重新输入。" << endl;
+                continue;
+            }
+            else {
+                if (dfs(0, 0)) { // 从入口开始搜索
+                    printMazeWithPath(); // 打印带路径的迷宫
+                    printPath(); // 打印路径
+                } else {
+                    cout << "未找到路径" << endl;
+                }
+                deallocateMemory();
+            }
         }
-
-
-        if (dfs(0, 0)) { // 从入口开始搜索
-            printMazeWithPath(); // 打印带路径的迷宫
-            printPath(); // 打印路径
-
-        } else {
-            cout << "No path found." << endl;
-        }
-        deallocateMemory(); 
     }
     return 0;
 }

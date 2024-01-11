@@ -14,7 +14,6 @@ int main() {
         cerr << "无法打开文件output.txt进行写入" << endl;
         return 1;
     }
-
     srand(time(0)); 
 
     for (int i = 0; i < size; ++i) {
@@ -23,11 +22,7 @@ int main() {
         }
         outFile << "\n"; 
     }
-
-
     outFile.close();
-
     cout << "数组已成功写入文件output.txt" << endl;
-
     return 0;
 }
